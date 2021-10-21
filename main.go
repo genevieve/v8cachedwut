@@ -14,24 +14,14 @@ func main() {
 
 	iso := v8.NewIsolate()
 	defer iso.Dispose()
+	ctx := v8.NewContext(iso)
+	defer ctx.Close()
 
 	start := time.Now()
-	data := iso.CompileScript(s, "script.js")
-	fmt.Printf("\nduration to compile script %s\n", time.Since(start))
-	fmt.Println("parent process sends: ")
-	fmt.Println(data)
+	ctx.RunScript(s, "script.js")
+	fmt.Printf("\nduration to run script %s\n", time.Since(start))
 
 	cmd := exec.Command("go", "run", "child/main.go")
-	stdin, err := cmd.StdinPipe()
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, err = stdin.Write(data)
-	if err != nil {
-		log.Fatal(err)
-	}
-	stdin.Close()
-
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Fatal(err)
