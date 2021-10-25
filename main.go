@@ -16,7 +16,10 @@ func main() {
 	defer iso.Dispose()
 
 	start := time.Now()
-	data := iso.CompileScript(s, "script.js")
+	data, err := iso.CompileScript(s, "script.js", v8.ScriptCompilerCompileOptionEagerCompile)
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Printf("\nduration to compile script %s\n", time.Since(start))
 	fmt.Println("parent process sends: ")
 	fmt.Println(data)
